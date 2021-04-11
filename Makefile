@@ -15,7 +15,7 @@ i3ipcpp=lib/i3-ipcpp/build/lib/static/libi3-ipc++.a
 all: $(bin_dir)/$(project)
 
 $(i3ipcpp):
-	cd lib/i3-ipcpp && ./configure && make
+	git submodule update --init --recursive && cd lib/i3-ipcpp && ./configure && make
 
 $(obj_dir)/%.o : %.cpp
 	@mkdir -p $(obj_dir)

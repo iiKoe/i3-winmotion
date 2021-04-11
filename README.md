@@ -25,6 +25,17 @@ has to be an unique combination of the hint keys.
 _Note that the hints are displayed as uppercase, but the expected key presses are
 lower case._
 
+## Requirements
+* i3
+* [RapidJSON](https://rapidjson.org/)
+
+## Building
+Simply run `make` in the root of the project.
+
+It will automatically initialize the
+i3-ipcpp submodule and compile i3-ipcpp (if it's not already compiled).
+Then it will compile i3-winmotion and place the resulting binary in `./bin`.
+
 ## TODO
 Add argument parsing to make everything more configurable.
 
