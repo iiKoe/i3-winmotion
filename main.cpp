@@ -24,7 +24,7 @@
 using namespace std;
 
 
-const i3_containers::node *find_workpace_root(const i3_containers::node *node, const string &visible_workspace_name) {
+const i3_containers::node *find_workspace_root(const i3_containers::node *node, const string &visible_workspace_name) {
     if (node == nullptr) {
         return nullptr;
     }
@@ -34,7 +34,7 @@ const i3_containers::node *find_workpace_root(const i3_containers::node *node, c
     }
 
     for (const i3_containers::node &child : node->nodes) {
-        const auto * vis = find_workpace_root(&child, visible_workspace_name);
+        const auto * vis = find_workspace_root(&child, visible_workspace_name);
         if (vis != nullptr) {
             return vis;
         }
@@ -46,7 +46,7 @@ void find_visible_nodes(const i3_containers::node &node,
         list<const i3_containers::node *> &visible_nodes ) {
 
     // if this is a leaf node we add it and return
-    if (node.nodes.size() == 0) {
+    if (node.nodes.size() == 0 && node.type == i3_containers::node_type::con) {
         visible_nodes.push_back(&node);
     }
 
@@ -149,29 +149,32 @@ int main() {
     const i3_containers::node tree = i3.get_tree();
 
     auto workspaces = i3.get_workspaces();
-    string visible_workspace_name;
+    list<string> visible_workspace_names;
 
     for (const auto &w : workspaces) {
         if (w.is_visible) {
-            visible_workspace_name = w.name;
+            visible_workspace_names.push_back(w.name);
         }
     }
 
-    const auto *workspace_root = find_workpace_root(&tree, visible_workspace_name);
-    if (workspace_root == nullptr) {
-        cout << "Root workspace not found in the tree" << endl;
-        return 1;
-    }
-    //print_i3_tree(*workspace_root);
-
     list<const i3_containers::node *> visible_nodes;
-    find_visible_nodes(*workspace_root, visible_nodes);
 
-    // Optionally find floating nodes (all)
-    if (include_floating_nodes) {
-        for (const auto &fnode : workspace_root->floating_nodes) {
-            for (const auto &fchild : fnode.nodes) {
-                visible_nodes.push_back(&fchild);
+    for (const auto &visible_workspace_name: visible_workspace_names) {
+        const auto *workspace_root = find_workspace_root(&tree, visible_workspace_name);
+        if (workspace_root == nullptr) {
+            cout << "Root workspace not found in the tree" << endl;
+            return 1;
+        }
+        //print_i3_tree(*workspace_root);
+
+        find_visible_nodes(*workspace_root, visible_nodes);
+
+        // Optionally find floating nodes (all)
+        if (include_floating_nodes) {
+            for (const auto &fnode : workspace_root->floating_nodes) {
+                for (const auto &fchild : fnode.nodes) {
+                    visible_nodes.push_back(&fchild);
+                }
             }
         }
     }
