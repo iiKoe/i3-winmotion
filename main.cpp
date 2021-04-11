@@ -135,11 +135,6 @@ int get_hints(list<string> &hints, list<char> &hint_keys, unsigned int n) {
     else
         x = ceil(log10((double)n)/log10(L));
 
-    //int N = pow(L, X);
-    cout << "n = " << n << endl;
-    cout << "L = " << L << endl;
-    cout << "x = " << x << endl;
-
     construct_hints(hints, "", hint_keys, x);
     return x;
 }
@@ -253,10 +248,12 @@ int main() {
     list<char> hint_keys = {'j','k','l','f','d','s','a'};
     unsigned int keys_in_hint = get_hints(hints, hint_keys, visible_nodes.size());
 
+#if 0
     cout << "Key combos" << endl;
     for (const auto &combo : hints) {
         cout << "Key combo: " << combo << endl;
     }
+#endif
 
     map<string, const i3_containers::node *> key_node_map;
 
@@ -279,7 +276,6 @@ int main() {
     // Take the focus
     XSetInputFocus(d, overlay, RevertToNone, CurrentTime);
 
-#if 1
     //this_thread::sleep_for(chrono::milliseconds(5000));
     /* event loop */
     cout << "Entering event loop" << endl;
@@ -313,7 +309,6 @@ int main() {
                 break;
         }
     }
-#endif
 
     cairo_destroy(cr);
     cairo_surface_destroy(surf);
