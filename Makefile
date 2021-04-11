@@ -1,20 +1,32 @@
 CC = g++
 
 project = i3-winmotion
+obj_dir = ./build
+bin_dir = ./bin
 
 src = main.cpp printtree.cpp
-obj = $(src:%.cpp=%.o)
+obj = $(src:%.cpp=$(obj_dir)/%.o)
 
-CPPFLAGS := -O3 -std=c++17 -I../i3-ipcpp/include
-LDFLAGS = -L../i3-ipcpp/build/lib/static/ -lcairo -lX11 -l:libi3-ipc++.a
+CPPFLAGS := -O3 -Wall -std=c++17 -I../i3-ipcpp/include
+LDFLAGS = -Llib/i3-ipcpp/build/lib/static/ -lcairo -lX11 -l:libi3-ipc++.a
 
-$(project): $(obj)
+i3ipcpp=lib/i3-ipcpp/build/lib/static/libi3-ipc++.a
+
+all: $(bin_dir)/$(project)
+
+$(i3ipcpp):
+	cd lib/i3-ipcpp && ./configure && make
+
+$(obj_dir)/%.o : %.cpp
+	@mkdir -p $(obj_dir)
+	$(CC) $(CPPFLAGS) -c -o $@ $^
+
+$(bin_dir)/$(project): $(i3ipcpp) $(obj)
+	@mkdir -p $(bin_dir)
 	$(CC) -o $@ $^ $(LDFLAGS)
-
-all: $(project)
 
 .PHONY: clean
 
 clean:
-	rm -f $(obj) $(project)
+	rm -rf $(obj_dir) $(project)
 
