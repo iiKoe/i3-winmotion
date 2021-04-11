@@ -1,0 +1,3 @@
+[submodule "lib/i3-ipcpp"]
+	path = lib/i3-ipcpp
+	url = https://github.com/Iskustvo/i3-ipcpp.git
