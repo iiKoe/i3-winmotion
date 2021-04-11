@@ -19,6 +19,7 @@
 #include "i3_ipc.hpp"
 #include "i3_containers.hpp"
 
+#include "Config.h"
 #include "printtree.h"
 
 using namespace std;
@@ -139,8 +140,10 @@ int get_hints(list<string> &hints, list<char> &hint_keys, unsigned int n) {
     return x;
 }
 
-int main() {
-    bool include_floating_nodes = true;
+int main(int argc, char *argv[]) {
+    Config config = {argc, argv};
+    config.print();
+    //exit(1);
 
     // Create IPC object and connect it to running i3 process.
     i3_ipc i3;
@@ -170,7 +173,7 @@ int main() {
         find_visible_nodes(*workspace_root, visible_nodes);
 
         // Optionally find floating nodes (all)
-        if (include_floating_nodes) {
+        if (config.hint_floating) {
             for (const auto &fnode : workspace_root->floating_nodes) {
                 for (const auto &fchild : fnode.nodes) {
                     visible_nodes.push_back(&fchild);
@@ -240,15 +243,17 @@ int main() {
     cairo_t* cr = cairo_create(surf);
 
     cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.4);
-    draw(cr, width, height);
+    if (config.fullscreen_overlay) {
+        draw(cr, width, height);
+    }
 
     /* Draw some text */
-    cairo_select_font_face(cr, "monospace", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-    cairo_set_font_size(cr, 100);
+    cairo_select_font_face(cr, config.font.c_str(), CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+    cairo_set_font_size(cr, config.font_size);
 
     // Generate hints
     list<string> hints;
-    list<char> hint_keys = {'j','k','l','f','d','s','a'};
+    list<char> &hint_keys = config.hint_keys;
     unsigned int keys_in_hint = get_hints(hints, hint_keys, visible_nodes.size());
 
 #if 0
