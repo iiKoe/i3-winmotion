@@ -25,6 +25,9 @@ has to be an unique combination of the hint keys.
 _Note that the hints are displayed as uppercase, but the expected key presses are
 lower case._
 
+## TODO
+Add argument parsing to make everything more configurable.
+
 ## Demo
 ![i3-winmotion in action 1](screenshots/demo.gif)
 ![i3-winmotion in action 2](screenshots/screenshot_default.png)
