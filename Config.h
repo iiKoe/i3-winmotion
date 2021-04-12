@@ -53,7 +53,7 @@ struct Config {
                 {0, 0, NULL, 0}
             };
 
-            c = getopt_long(argc, argv, "of:s:k:w", long_options, &option_index);
+            c = getopt_long(argc, argv, "of:s:k:wh", long_options, &option_index);
             if (c == -1) {
                 break;
             }
