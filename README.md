@@ -1,7 +1,7 @@
 # i3-winmotion
 
 i3-winmotion is a tool that allows you to move between [i3](https://i3wm.org/)
-windows using a using specified focus keys (see the demo below).
+windows using specified focus keys (see the demo below).
 
 The credits for the idea go to [pcharest2000/winswitch](https://github.com/pcharest2000/winswitch).
 i3-winmotion is a complete rewrite using the i3-ipc bindings provided by
@@ -12,22 +12,23 @@ i3-winmotion is a complete rewrite using the i3-ipc bindings provided by
 
 ## How it works
 i3-winmotion uses the hint keys (default: 'asdfjkl') to create 'hints'
-consisting of the minimum number of characters to create unique hints that are
-assigned to the visible windows. Entering the displayed key combination will
-cause the corresponding window to become focussed. Pressing escape exits the
-application and keeps the focus unchanged.
+consisting of the minimum number of characters to create unique hints.
+Each visible window is assigned a hint. Entering the displayed hint causes the
+corresponding window to become focused. Pressing escape exits the application
+and keeps the focus unchanged.
 
-For example, if there are 2 hint keys and 2 visible windows, each window will have one
-unique hint key assigned. But if there are 2 hint keys and 3 visible windows
-i3-winmotion will assign hints consisting of 2 keys to each window as each hint
-has to be an unique combination of the hint keys.
+For example, if there are 2 hint keys and 2 visible windows, each window will
+have one unique hint key assigned. However, if there are 2 hint keys and 3
+visible windows i3-winmotion will assign hints consisting of 2 keys to each
+window as each hint has to be a unique combination of the hint keys.
 
 _Note that the hints are displayed as uppercase, but the expected key presses are
-lower case._
+lowercase._
 
 ## Requirements
 * i3
 * [RapidJSON](https://rapidjson.org/)
+* A compositor that supports drawing overlays (e.g., [picom](https://github.com/yshui/picom)).
 
 ## Building
 Simply run `make` in the root of the project.
@@ -35,6 +36,20 @@ Simply run `make` in the root of the project.
 It will automatically initialize the
 i3-ipcpp submodule and compile i3-ipcpp (if it's not already compiled).
 Then it will compile i3-winmotion and place the resulting binary in `./bin`.
+
+## Usage
+```
+OVERVIEW: i3-winmotion window visible window switcher
+
+USAGE: i3-winmotion [options]
+
+ -k, --hint-keys <keys>       Hint key string used to generate hints (default: 'jklfdsa')
+ -o, --fullscreen-overlay     Add a slightly black transparent background
+ -f, --font <name>            Hint font (default: monospace)
+ -s, --font-size <size>       Hint font size (default: 100)
+ -w, --hint-floating          Draw hints on floating windows
+ -h, --help                   Display this help and exit
+```
 
 ## TODO
 Add argument parsing to make everything more configurable.
