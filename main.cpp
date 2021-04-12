@@ -22,6 +22,8 @@
 #include "Config.h"
 #include "printtree.h"
 
+//#define DEBUG
+
 using namespace std;
 
 
@@ -142,8 +144,7 @@ int get_hints(list<string> &hints, list<char> &hint_keys, unsigned int n) {
 
 int main(int argc, char *argv[]) {
     Config config = {argc, argv};
-    config.print();
-    //exit(1);
+    //config.print();
 
     // Create IPC object and connect it to running i3 process.
     i3_ipc i3;
@@ -165,7 +166,7 @@ int main(int argc, char *argv[]) {
     for (const auto &visible_workspace_name: visible_workspace_names) {
         const auto *workspace_root = find_workspace_root(&tree, visible_workspace_name);
         if (workspace_root == nullptr) {
-            cout << "Root workspace not found in the tree" << endl;
+            cerr << "Root workspace not found in the tree" << endl;
             return 1;
         }
         //print_i3_tree(*workspace_root);
@@ -182,10 +183,12 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    #ifdef DEBUG
     cout << "Visible nodes:" << endl;
     for (const auto *node : visible_nodes) {
         cout << node->name.value_or("unknown") << endl;
     }
+    #endif
 
     if (visible_nodes.size() <= 1) {
         cout << "not enough visible nodes" << endl;
@@ -203,13 +206,16 @@ int main(int argc, char *argv[]) {
 
     XVisualInfo vinfo;
     if (!XMatchVisualInfo(d, DefaultScreen(d), 32, TrueColor, &vinfo)) {
-        printf("No visual found supporting 32 bit color, terminating\n");
+        cerr << "No visual found supporting 32 bit color, terminating" << endl;
         exit(EXIT_FAILURE);
     }
 
     auto width = DisplayWidth(d, default_screen);
     auto height = DisplayHeight(d, default_screen);
+
+    #ifdef DEBUG
     cout << "Screen width: " << width << " height:" << height << endl;
+    #endif
 
     // these next three lines add 32 bit depth, remove if you dont need and change the flags below
     attrs.colormap = XCreateColormap(d, root, vinfo.visual, AllocNone);
@@ -256,10 +262,10 @@ int main(int argc, char *argv[]) {
     list<char> &hint_keys = config.hint_keys;
     unsigned int keys_in_hint = get_hints(hints, hint_keys, visible_nodes.size());
 
-#if 0
-    cout << "Key combos" << endl;
+#ifdef DEBUG
+    cout << "Hint key combos: " << endl;
     for (const auto &combo : hints) {
-        cout << "Key combo: " << combo << endl;
+        cout << "  " << combo << endl;
     }
 #endif
 
@@ -282,11 +288,12 @@ int main(int argc, char *argv[]) {
     XFlush(d);
 
     // Take the focus
-    XSetInputFocus(d, overlay, RevertToNone, CurrentTime);
+    XSetInputFocus(d, overlay, RevertToParent, CurrentTime);
 
-    //this_thread::sleep_for(chrono::milliseconds(5000));
-    /* event loop */
+    #ifdef DEBUG
     cout << "Entering event loop" << endl;
+    #endif
+
     XEvent event;
 
     string key_string;
@@ -295,7 +302,6 @@ int main(int argc, char *argv[]) {
 
         /* keyboard events */
         if (event.type == KeyPress) {
-            //printf( "KeyPress: %x\n", event.xkey.keycode);
             /* exit on ESC key press */
             if ( event.xkey.keycode == 0x09 )
                 break;
@@ -303,12 +309,16 @@ int main(int argc, char *argv[]) {
             char buff[32];
             XLookupString(&event.xkey, buff, sizeof(buff), NULL, NULL);
             string c = string(buff);
+            #ifdef DEBUG
             cout << "Keypress: " << c << endl;
+            #endif
 
             key_string += c;
 
             if (std::find(std::begin(hint_keys), std::end(hint_keys), buff[0]) == std::end(hint_keys)) {
-                cout << "key '" << c << "' is not a valid hint key" << endl;
+                #ifdef DEBUG
+                cerr << "key '" << c << "' is not a valid hint key" << endl;
+                #endif
                 break;
             }
 
@@ -318,28 +328,37 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    cairo_font_face_destroy(cairo_get_font_face(cr));
     cairo_destroy(cr);
     cairo_surface_destroy(surf);
 
     XUnmapWindow(d, overlay);
 
+    auto rval = EXIT_SUCCESS;
+
     auto selected = key_node_map.find(key_string);
     if (selected != key_node_map.end()) {
         // Found a valid hint
         auto focus_node = selected->second;
+        #ifdef DEBUG
         cout << "Focussing on '" << focus_node->name.value_or("unknown") << "'" << endl;
+        #endif
         if (focus_node->window.has_value()) {
             auto focus_window = focus_node->window.value();
             XSetInputFocus(d, focus_window, RevertToParent, CurrentTime);
         } else {
-            cout << "Focus error" << endl;
+            cerr << "Focus error" << endl;
+            rval = EXIT_FAILURE;
         }
     } else {
+        #ifdef DEBUG
         cout << "Unrecognised hint: '" << key_string << "'" << endl;
+        #endif
+        rval = EXIT_FAILURE;
     }
 
     XCloseDisplay(d);
 
-    return EXIT_SUCCESS;
+    return rval;
 }
 
