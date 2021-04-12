@@ -51,9 +51,6 @@ USAGE: i3-winmotion [options]
  -h, --help                   Display this help and exit
 ```
 
-## TODO
-Add argument parsing to make everything more configurable.
-
 ## Demo
 ![i3-winmotion in action 1](screenshots/demo.gif)
 ![i3-winmotion in action 2](screenshots/screenshot_default.png)
