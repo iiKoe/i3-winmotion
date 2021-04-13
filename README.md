@@ -1,14 +1,15 @@
 # i3-winmotion
 
-i3-winmotion is a tool that allows you to move between [i3](https://i3wm.org/)
-windows using specified focus keys (see the demo below).
+i3-winmotion is a tool that allows you to move between **visible** [i3](https://i3wm.org/)
+windows using specified hint keys (see the demo below).
 
-The credits for the idea go to [pcharest2000/winswitch](https://github.com/pcharest2000/winswitch).
+The credits for the idea go to [pcharest2000/winswitch](https://github.com/pcharest2000/winswitch)
+and [svenstaro/wmfocus](https://github.com/svenstaro/wmfocus).
 i3-winmotion is a complete rewrite using the i3-ipc bindings provided by
 [i3-ipcpp](https://github.com/Iskustvo/i3-ipcpp), which allows i3-winmotion to
-**only highlight visible windows**, avoiding overlapping hints. This is done by
- traversing the i3 JSON workspace layout and enabling hints only for the visible
- windows in a tab or stack.
+**only highlight visible windows**, avoiding overlapping or (in my opinion) confusing hints.
+This is done by traversing the i3 JSON workspace layout and enabling hints only for the visible
+windows in a tab or stack.
 
 ## How it works
 i3-winmotion uses the hint keys (default: 'asdfjkl') to create 'hints'
@@ -51,8 +52,18 @@ USAGE: i3-winmotion [options]
  -h, --help                   Display this help and exit
 ```
 
+## Differences With Other Window Switchers
+I'm not saying anything negative about the other window switchers.
+They are great, just not ideal for **my** workflow.
+
+* [pcharest2000/winswitch](https://github.com/pcharest2000/winswitch)
+does not use any i3 information resulting in overlapping hints for tabbed and stacked windows.
+
+* [svenstaro/wmfocus](https://github.com/svenstaro/wmfocus)
+does use i3 information but also draws hints for all the hidden windows in a tab or stack.
+For my workflow, with a lot of tabs with splits in it, this quickly becomes confusing.
+
 ## Demo
 ![i3-winmotion in action 1](screenshots/demo.gif)
 ![i3-winmotion in action 2](screenshots/screenshot_default.png)
 ![i3-winmotion in action 3](screenshots/screenshot_floating.png)
-
