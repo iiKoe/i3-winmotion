@@ -79,7 +79,7 @@ struct Config {
                     break;
 
                 case 'w':
-                    hint_floating = false;
+                    hint_floating = true;
                     break;
 
                 case 'h':
